@@ -1,0 +1,49 @@
+# !pip3 install scikit-learn numpy pandas matplotlib seaborn gradio
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+import seaborn as sns
+import gradio as gr
+url = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
+url
+df = pd.read_csv(url)
+df
+df['Churn'].unique()
+df.info()
+df['InternetService'].unique()
+df['InternetService'] = df['InternetService'].map({"DSL":1, "Fiber optic":2, "No":0})
+df['InternetService'].unique()
+df['Contract'].unique()
+df['Contract'] = df['Contract'].map({"Month-to-month":0, "One year":1, "Two year":2})
+df['Contract'].unique()
+df.info()
+df['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors='coerce')
+#we have to drop the nan values(i.e., no values in that row) we will drop it by dropna() where inplace is true will drop it and not change our table.
+#while doing this for each variable i.e., x and y we do it commonly for the df
+#the output comes as nan which means (not a number) which means missing or invalid data is in the table. 
+#it came while doing separately but after the below code it did not.
+df.dropna(inplace=True)
+features = ['tenure', 'MonthlyCharges', 'TotalCharges', 'Contract', 'InternetService']
+X = df[features]
+X
+y = df['Churn']
+y
+X_train, X_test, y_train, y_test=train_test_split(X,y, test_size=0.2, random_state=42)
+X_test
+y_test
+X_train['TotalCharges'].iloc[487]
+X_train['TotalCharges'] = pd.to_numeric(df['TotalCharges'], errors="coerce")
+X_train.dropna(inplace=True)
+sc = StandardScaler()
+X_train = sc.fit_transform(X_train)
+X_train.std()
+X_test = sc.fit_transform(X_test)
+lr=LogisticRegression()
+lr.fit(X_train,y_train)
+y_pred=lr.predict(X_test)
+y_pred
+print(classification_report(y_test,y_pred))
